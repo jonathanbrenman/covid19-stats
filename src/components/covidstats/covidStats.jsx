@@ -16,17 +16,32 @@ class CovidStats extends React.Component {
   }
 
   getCovidInfo() {
-    fetch("https://api.covid19api.com/summary")
+    fetch("https://corona-virus-stats.herokuapp.com/api/v1/cases/countries-search")
     .then((response) => {
       return response.json();
     })
     .then((data) => {
-      this.setState({ data })
+      this.setState({ data: data.data.rows[0] })
     })
     .catch(err => {
       console.log(err);
     });
   }
+
+  getCovidInfoByCountry(countryName) {
+    fetch(`https://corona-virus-stats.herokuapp.com/api/v1/cases/countries-search?search=${countryName}`)
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      this.setState({ selectedItem: data.data.rows[0] })
+    })
+    .catch(err => {
+      console.log(err);
+    });
+  }
+
+  
 
   componentDidMount() {
     this.getCovidInfo();
@@ -37,42 +52,38 @@ class CovidStats extends React.Component {
     let target = parseInt(event.currentTarget.id.split("-")[3]);
     if (!countries[target]) { return }
     let selectedItem = countries[target].label;
-    let found = this.state.data.Countries.find( x => x.Country === selectedItem);
-
-    this.setState({
-      selectedItem: found
-    })
+    this.getCovidInfoByCountry(selectedItem);
   }
 
   render() {
     const { data, selectedItem } = this.state;
     return (
       <div>
-        { data.Global && 
+        { data && 
           <div className="flex-container">
             <div className="box">
-              <span className="title">Nuevos Confirmados:</span> <br />
-              {data.Global.NewConfirmed}
-            </div>
-            <div className="box">
               <span className="title">Total Confirmados:</span><br />
-              {data.Global.TotalConfirmed}
+              {data.total_cases}
             </div>
             <div className="box">
-              <span className="title">Nuevas Muertes:</span><br />
-              {data.Global.NewDeaths}
-            </div>
-            <div className="box">
-              <span className="title">Total Muertes:</span><br />
-              {data.Global.TotalDeaths}
-            </div>
-            <div className="box">
-              <span className="title">Nuevos Recuperados:</span><br />
-              {data.Global.NewRecovered}
+              <span className="title">Casos Activos:</span><br />
+              {data.active_cases}
             </div>
             <div className="box">
               <span className="title">Total Recuperados:</span><br />
-              {data.Global.TotalRecovered}
+              {data.total_recovered}
+            </div>
+            <div className="box">
+              <span className="title">Nuevos Confirmados:</span> <br />
+              {data.new_cases}
+            </div>
+            <div className="box">
+              <span className="title">Total Muertes:</span><br />
+              {data.total_deaths}
+            </div>
+            <div className="box">
+              <span className="title">Nuevas Muertes:</span><br />
+              {data.new_deaths}
             </div>
 
             <div className="country-selector">
@@ -81,23 +92,32 @@ class CovidStats extends React.Component {
               </div>
               { selectedItem && 
                 <div className="flex-container">
+                <div>
+                  <img className="box img" src={selectedItem.flag} />
+                </div>
                   <div className="box">
-                    <span className="title">Nuevos Confirmados:</span> <br /> {selectedItem.NewConfirmed} <br/> <span className="title">{Moment(selectedItem.Date).format("DD-MM-YYYY HH:mm")}</span>
+                    <span className="title">Nuevos Confirmados:</span> <br /> {selectedItem.new_cases}
                   </div>
                   <div className="box">
-                    <span className="title">Total Confirmados:</span> <br /> {selectedItem.TotalConfirmed} <br/> <span className="title">{Moment(selectedItem.Date).format("DD-MM-YYYY HH:mm")}</span>
+                    <span className="title">Total Confirmados:</span> <br /> {selectedItem.total_cases}
                   </div>
                   <div className="box">
-                    <span className="title">Nuevas Muertes:</span> <br /> {selectedItem.NewDeaths} <br/> <span className="title">{Moment(selectedItem.Date).format("DD-MM-YYYY HH:mm")}</span>
+                    <span className="title">Nuevas Muertes:</span> <br /> {selectedItem.new_deaths}
                   </div>
                   <div className="box">
-                    <span className="title">Total Muertes:</span> <br /> {selectedItem.TotalDeaths} <br/> <span className="title">{Moment(selectedItem.Date).format("DD-MM-YYYY HH:mm")}</span>
+                    <span className="title">Total Muertes:</span> <br /> {selectedItem.total_deaths}
                   </div>
                   <div className="box">
-                    <span className="title">Nuevos Recuperados:</span> <br /> {selectedItem.NewRecovered} <br/> <span className="title">{Moment(selectedItem.Date).format("DD-MM-YYYY HH:mm")}</span>
+                    <span className="title">Nuevos Activos:</span> <br /> {selectedItem.active_cases}
                   </div>
                   <div className="box">
-                    <span className="title">Total Recuperados:</span> <br /> {selectedItem.TotalRecovered} <br/> <span className="title">{Moment(selectedItem.Date).format("DD-MM-YYYY HH:mm")}</span>
+                    <span className="title">Total Recuperados:</span> <br /> {selectedItem.total_recovered}
+                  </div>
+                  <div className="box">
+                    <span className="title">Estado Critico:</span> <br /> {selectedItem.serious_critical}
+                  </div>
+                  <div className="box">
+                    <span className="title">Casos cada Mil (poblacion):</span> <br /> {selectedItem.cases_per_mill_pop}
                   </div>
                 </div>
               }

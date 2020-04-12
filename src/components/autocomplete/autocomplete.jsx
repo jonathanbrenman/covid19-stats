@@ -28,9 +28,8 @@ class AutoComplete extends React.Component {
     return (
       <Autocomplete
         id="country-select"
-        onChange={this.props.updateSelectedItem}
+        onInputChange={this.props.updateSelectedItem}
         options={countries}
-        autoHighlight
         getOptionLabel={(option) => option.label}
         renderOption={(option) => (
           <React.Fragment>

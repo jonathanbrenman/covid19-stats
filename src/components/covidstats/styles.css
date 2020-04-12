@@ -30,3 +30,8 @@
 .country-selector {
     width: 100%;
 }
+
+.img {
+    background: white;
+    width: 100px;
+}
